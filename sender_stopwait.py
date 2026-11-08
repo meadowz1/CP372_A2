@@ -69,9 +69,9 @@ def parse_packet(raw):
         return None
     return Packet(ptype, seq, ack, payload)
 
-DEFAULT_PAYLOAD = 1024      # bytes of file data per DATA packet
-DEFAULT_TIMEOUT = 0.05      # seconds
-MAX_RETRIES = 500           # give up on a packet after this many retransmissions
+DEFAULT_PAYLOAD = 1024      ## bytes of file data per DATA packet
+DEFAULT_TIMEOUT = 0.05      ## seconds
+MAX_RETRIES = 500           ## give up on a packet after this many retransmissions
 
 
 class TransferError(Exception):
@@ -80,7 +80,7 @@ class TransferError(Exception):
 
 class Stats:
     def __init__(self):
-        self.packets_sent = 0       # every transmission, including retransmissions
+        self.packets_sent = 0  ## every transmission, including retransmissions
         self.retransmissions = 0
         self.timeouts = 0
 
@@ -95,7 +95,7 @@ def send_reliably(sock, addr, seq, packet, timeout, stats):
             stats.retransmissions += 1
         attempts += 1
 
-        deadline = time.monotonic() + timeout      # timer starts after transmission
+        deadline = time.monotonic() + timeout ## timer starts after transmission
         while True:
             remaining = deadline - time.monotonic()
             if remaining <= 0:
@@ -107,8 +107,8 @@ def send_reliably(sock, addr, seq, packet, timeout, stats):
                 break
             pkt = parse_packet(raw)
             if pkt and src == addr and pkt.ptype == TYPE_ACK and pkt.ack == seq:
-                return                              # correct ACK -> next packet
-            # corrupted, stale or duplicate ACK: ignore and keep waiting
+                return                           ## correct ACK -> next packet
+            ## corrupted, stale or duplicate ACK: ignore and keep waiting
 
         stats.timeouts += 1
         if attempts > MAX_RETRIES:
@@ -148,16 +148,16 @@ def main():
     try:
         start = time.monotonic()
 
-        # 1) announce the file
+        ## announce the file
         send_reliably(sock, addr, 0, build_packet(TYPE_UPLOAD, 0, payload=name.encode()),
                       args.timeout, stats)
-        # 2) one DATA packet at a time
+        ## one data packet at a time
         for i in range(n_data):
             seq = i + 1
             chunk = data[i * args.payload:(i + 1) * args.payload]
             send_reliably(sock, addr, seq, build_packet(TYPE_DATA, seq, payload=chunk),
                           args.timeout, stats)
-        # 3) announce completion (payload = total size so the receiver can verify)
+        ## announce completion (payload = total size so the receiver can verify)
         send_reliably(sock, addr, fin_seq,
                       build_packet(TYPE_FIN, fin_seq, payload=struct.pack("!Q", len(data))),
                       args.timeout, stats)

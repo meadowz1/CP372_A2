@@ -76,7 +76,7 @@ def parse_packet(raw):
 DEFAULT_PAYLOAD = 1024
 DEFAULT_TIMEOUT = 0.05
 DEFAULT_WINDOW = 8
-MAX_CONSECUTIVE_TIMEOUTS = 500   # give up if the window makes no progress this often
+MAX_CONSECUTIVE_TIMEOUTS = 500   ## give up if the window makes no progress this often
 
 
 def load_content(args):
@@ -128,7 +128,7 @@ def main():
         pass
 
     base, nextseqnum = 0, 0
-    timer_start = None                     # single timer for the oldest unACKed packet
+    timer_start = None                     ## single timer for the oldest unACKed packet
     packets_sent = retransmissions = timeouts = 0
     stalled = 0
 
@@ -146,7 +146,7 @@ def main():
             # ---- wait for an ACK or for the timer to expire -------------------
             remaining = timer_start + args.timeout - time.monotonic()
             if remaining <= 0:
-                # timeout: go back and resend everything outstanding
+                ## timeout: go back and resend everything outstanding
                 timeouts += 1
                 stalled += 1
                 if stalled > MAX_CONSECUTIVE_TIMEOUTS:
