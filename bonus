@@ -1,0 +1,11 @@
+CP372 Assignment 2 - Bonus Implementation Note
+
+Our project implements robust packet corruption detection using CRC32 checksums 
+via Python's built-in `zlib` library. Every packet header includes a 4-byte 
+checksum field (`csum`) calculated over the entire packet structure (type, 
+sequence number, acknowledgment number, payload length, and payload data). 
+
+Upon receiving data packets or acknowledgments, both senders and receivers 
+re-calculate the CRC32 checksum. If a packet's data is corrupted in transit 
+or modified by the simulation loss rate, the checksum verification fails, 
+triggering a packet drop / retransmission behavior.
